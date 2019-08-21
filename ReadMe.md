@@ -53,10 +53,10 @@ optimize_visual_inertial --ba_num_iterations=50
 ## Example Merges
 
 Example map merging of the V1_01_easy, V1_02_medium, and V1_03_difficult from the EurocMav datasets:
-![example alignment](docs/Screenshot from 2019-08-21 14-13-32.png)
+![example eurocmav](docs/2019-08-21_14-13-32.png)
 
 Example map merging of the room1, room2, room3, and corridor1 from the TUM-VI datasets:
-![example alignment](docs/Screenshot from 2019-08-21 13-38-24.png)
+![example tumvi](docs/2019-08-21_13-38-24.png)
 
 
 
