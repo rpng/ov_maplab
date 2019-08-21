@@ -9,13 +9,13 @@ In the future we will try to only extract descriptors on tracked features from O
 We have tested this on the [EurocMav](https://docs.openvins.com/gs-datasets.html#gs-data-euroc) and [TUM-VI](https://docs.openvins.com/gs-datasets.html#gs-data-tumvi) datasets and have had good success with merging the different runs and optimizing the resulting graph.
 
 
-### Dependencies
+## Dependencies
 
 * OpenVINS - https://docs.openvins.com/gs-installing.html
 * maplab - https://github.com/ethz-asl/maplab/wiki/Installation-Ubuntu
 
 
-### Processing Map Example
+## Processing Map Example
 
 ```
 # load into the main console
@@ -36,10 +36,10 @@ set_mission_baseframe_to_known
 anchor_all_missions
 # display the baseframe transforms
 print_baseframes
-# Key-frame the map.
-keyframe_heuristic
 # Pose graph relaxation
 relax
+# Key-frame the map.
+keyframe_heuristic
 # Loop close the map.
 loopclosure_all_missions
 # Visualize all missions with different colors
@@ -50,7 +50,13 @@ optimize_visual_inertial --ba_num_iterations=50
 
 
 
+## Example Merges
 
+Example map merging of the V1_01_easy, V1_02_medium, and V1_03_difficult from the EurocMav datasets:
+![example alignment](docs/Screenshot from 2019-08-21 14-13-32.png)
+
+Example map merging of the room1, room2, room3, and corridor1 from the TUM-VI datasets:
+![example alignment](docs/Screenshot from 2019-08-21 13-38-24.png)
 
 
 
