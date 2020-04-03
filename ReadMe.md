@@ -15,6 +15,31 @@ We have tested this on the [EurocMav](https://docs.openvins.com/gs-datasets.html
 * maplab - https://github.com/ethz-asl/maplab/wiki/Installation-Ubuntu
 
 
+## Installation Commands
+
+```
+# setup our workspace
+mkdir -p catkin_ws_maplab/src/
+cd catkin_ws_maplap
+catkin init
+catkin config --merge-devel # Necessary for catkin_tools >= 0.4.
+catkin config --extend /opt/ros/kinetic/
+catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+# repositories to clone
+cd src
+git clone https://github.com/rpng/ov_maplab.git
+git clone https://github.com/rpng/open_vins.git
+git clone https://github.com/ethz-asl/maplab.git --recursive
+git clone https://github.com/ethz-asl/maplab_dependencies --recursive
+# need to fix the opencv to build with a 3.4.x version
+cd maplab_dependencies/3rdparty/opencv3_catkin/
+git checkout feature/3.4.2
+# go back to root and build
+cd ..
+catkin build maplab ov_maplab -j4
+```
+
+
 ## Processing Map Example
 
 ```
@@ -38,7 +63,7 @@ anchor_all_missions
 print_baseframes
 # Pose graph relaxation
 relax
-# Key-frame the map.
+# Key-frame the map (needed to reduce memory requirements)
 keyframe_heuristic
 # Loop close the map.
 loopclosure_all_missions
@@ -46,7 +71,34 @@ loopclosure_all_missions
 v --vis_color_by_mission
 # Bundle adjustment.
 optimize_visual_inertial --ba_num_iterations=50
+# Save the final map (overwrite the old map if there is one)
+save --overwrite --map_folder <your_new_merged_map_folder_path>
 ```
+
+
+## Leveraging Maplab as Groundtruth
+
+A use case is if one wishes to use maplab optimized and loop-closed trajectory as groundtruth for evaluation on datasets which do not have an external pose system (i.e. no vicon available).
+For example of the V1\_01\_easy eurocmav dataset before optimization the RMSE was 0.680 degrees and 0.055 meters.
+After performing loop closure and optimizing the RMSE was 0.576 degrees and 0.021 meters as compared to the published groundtruth.
+Here are a few example commands which we use to process a run on the eurocmav dataset and then optimize it to be used as a groundtruth.
+```
+# run openvins and export the map
+roslaunch ov_maplab pgeneva_eth.launch
+# load the map into maplab
+rosrun maplab_console maplab_console
+load --map_folder ~/datasets/eth/maplab/V1_01_easy/
+# optimize the map
+retriangulate_landmarks
+remove_bad_landmarks
+set_mission_baseframe_to_known
+loopclosure_all_missions
+optimize_visual_inertial --ba_num_iterations=10
+# finally, we can export using our custom utility
+# this will get it into our space seperated format needed for ov_eval
+export_to_openvins --export_path ~/datasets/eth/maplab/
+```
+
 
 
 

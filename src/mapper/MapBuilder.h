@@ -41,7 +41,9 @@
 
 
 #include "core/VioManager.h"
+#include "core/VioManagerOptions.h"
 #include "state/Propagator.h"
+
 
 using namespace ov_msckf;
 
@@ -58,8 +60,9 @@ public:
      * @brief Default constructor
      * @param nh ROS node handler
      * @param app Core estimator manager
+     * @param params Core estimator parameters
      */
-    MapBuilder(ros::NodeHandle &nh, VioManager* app);
+    MapBuilder(ros::NodeHandle &nh, VioManager* app, const VioManagerOptions &params);
 
     /**
      * @brief Feed function for inertial data
@@ -97,9 +100,11 @@ public:
 
 protected:
 
-
     /// Our msckf filter estimator
     VioManager* _app;
+
+    /// Viomanger options and parameters
+    VioManagerOptions _params;
 
     /// Master map object that we want to save data into
     vi_map::VIMap* map;

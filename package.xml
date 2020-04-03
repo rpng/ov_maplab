@@ -34,6 +34,8 @@
     <build_depend>vio_common</build_depend>
     <build_depend>feature_tracking</build_depend>
     <build_depend>online_map_builders</build_depend>
+    <build_depend>catkin_simple</build_depend>
+    <build_depend>console_common</build_depend>
 
     <!-- Dependencies needed after this package is compiled. -->
     <run_depend>roscpp</run_depend>
@@ -51,6 +53,7 @@
     <run_depend>vio_common</run_depend>
     <run_depend>feature_tracking</run_depend>
     <run_depend>online_map_builders</run_depend>
+    <run_depend>console_common</run_depend>
 
 
 </package>

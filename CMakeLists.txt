@@ -7,7 +7,8 @@ project(ov_maplab)
 #set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
 
 # Find catkin (the ROS build system)
-find_package(catkin REQUIRED COMPONENTS roscpp rosbag tf std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs cv_bridge ov_core ov_msckf vi_map vio_common feature_tracking online_map_builders)
+find_package(catkin REQUIRED COMPONENTS roscpp rosbag tf std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs cv_bridge ov_core ov_msckf vi_map vio_common feature_tracking online_map_builders console_common)
+add_definitions(-DROS_AVAILABLE=1)
 
 # Include libraries
 find_package(Eigen3 REQUIRED)
@@ -21,7 +22,7 @@ message(STATUS "BOOST VERSION: " ${Boost_VERSION})
 
 # Describe catkin project
 catkin_package(
-        CATKIN_DEPENDS roscpp rosbag tf std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs cv_bridge ov_core ov_msckf vi_map vio_common feature_tracking online_map_builders
+        CATKIN_DEPENDS roscpp rosbag tf std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs cv_bridge ov_core ov_msckf vi_map vio_common feature_tracking online_map_builders console_common
         INCLUDE_DIRS src
 )
 
@@ -78,4 +79,14 @@ target_link_libraries(run_serial_msckf ov_maplab_lib ${thirdparty_libraries})
 
 
 
+##################################################
+# maplab console plugin
+##################################################
+find_package(catkin_simple REQUIRED)
+catkin_simple(ALL_DEPS_REQUIRED)
+add_definitions(-fPIC -shared)
+cs_add_library(export_to_openvins src/export_to_openvins.cpp)
+create_console_plugin(export_to_openvins)
+cs_install()
+cs_export()
 
