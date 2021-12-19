@@ -147,6 +147,7 @@ Example map merging of the room1, room2, room3, and corridor1 from the TUM-VI da
 ![example tumvi](docs/2019-08-21_13-38-24.png)
 
 Example map merging of the aruco_hallway_02 and aruco_hallway_02 from the RPNG aruco datasets (before left and after right):
+
 <img src="docs/aruco_before.png" width="49%"/> <img src="docs/aruco_after.png" width="49%"/> 
 
 
