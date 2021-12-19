@@ -1,7 +1,9 @@
 /*
  * OpenVINS: An Open Platform for Visual-Inertial Research
- * Copyright (C) 2019 Patrick Geneva
- * Copyright (C) 2019 OpenVINS Contributors
+ * Copyright (C) 2021 Patrick Geneva
+ * Copyright (C) 2021 Guoquan Huang
+ * Copyright (C) 2021 OpenVINS Contributors
+ * Copyright (C) 2019 Kevin Eckenhoff
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,136 +22,123 @@
 #ifndef OV_MAPLAB_MAPBUILDER_H
 #define OV_MAPLAB_MAPBUILDER_H
 
-#include <ros/ros.h>
-#include <cv_bridge/cv_bridge.h>
 #include <boost/filesystem.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <ros/ros.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/Imu.h>
 
 #include <aslam/cameras/camera-pinhole.h>
 #include <aslam/cameras/camera.h>
-#include <aslam/cameras/distortion.h>
 #include <aslam/cameras/distortion-equidistant.h>
 #include <aslam/cameras/distortion-radtan.h>
+#include <aslam/cameras/distortion.h>
 #include <aslam/cameras/ncamera.h>
-#include <vio-common/vio-types.h>
-#include <vio-common/vio-update.h>
+#include <feature-tracking/vo-feature-tracking-pipeline.h>
+#include <landmark-triangulation/landmark-triangulation.h>
 #include <maplab-common/file-logger.h>
 #include <maplab-common/map-manager-config.h>
+#include <maplab-common/progress-bar.h>
 #include <online-map-builders/stream-map-builder.h>
-#include <visualization/viwls-graph-plotter.h>
+#include <vi-map-helpers/vi-map-manipulation.h>
+#include <vi-map/sensor-utils.h>
 #include <vi-map/vi-map-serialization.h>
-#include <feature-tracking/vo-feature-tracking-pipeline.h>
-
+#include <vio-common/map-update.h>
+#include <vio-common/vio-types.h>
+#include <vio-common/vio-update.h>
+#include <visualization/viwls-graph-plotter.h>
 
 #include "core/VioManager.h"
 #include "core/VioManagerOptions.h"
 #include "state/Propagator.h"
-
+#include "utils/print.h"
 
 using namespace ov_msckf;
 
-
 /**
  * @brief Class that will take the output of ov_msckf and save it to our maplab ViMap.
+ *
  * This allows us to load this data into the maplab console and merge it with other maps.
+ * The estimator VioManager should be called externally as here we *poll* to get information from it.
  */
 class MapBuilder {
-
 public:
+  /**
+   * @brief Default constructor
+   * @param nh ROS node handler
+   * @param app Core estimator manager
+   * @param params Core estimator parameters
+   */
+  MapBuilder(std::shared_ptr<ros::NodeHandle> nh, std::shared_ptr<VioManager> app, const VioManagerOptions &params);
 
-    /**
-     * @brief Default constructor
-     * @param nh ROS node handler
-     * @param app Core estimator manager
-     * @param params Core estimator parameters
-     */
-    MapBuilder(ros::NodeHandle &nh, VioManager* app, const VioManagerOptions &params);
+  // Destructors to free maplab pointers
+  ~MapBuilder() {
+    delete builder;
+    delete map;
+    delete sensor_manager;
+    delete trackpipe;
+  }
 
-    /**
-     * @brief Feed function for inertial data
-     * @param timestamp Time of the inertial measurement
-     * @param wm Angular velocity
-     * @param am Linear acceleration
-     */
-    void feed_measurement_imu(double timestamp, Eigen::Vector3d wm, Eigen::Vector3d am) {
-        // Create our imu data object
-        Propagator::IMUDATA data;
-        data.timestamp = timestamp;
-        data.wm = wm;
-        data.am = am;
-        // Append it to our vector
-        imu_data.emplace_back(data);
-    }
+  /// Callback for inertial information
+  void callback_inertial(const sensor_msgs::Imu::ConstPtr &msg);
 
+  /// Callback for monocular cameras information
+  void callback_monocular(const sensor_msgs::ImageConstPtr &msg0, int cam_id0);
 
-    /**
-     * @brief Feed function for a single camera
-     * @param timestamp Time that this image was collected
-     * @param images Set of cameras for this timestamp
-     * @param cam_ids Set of ids for this camera
-     */
-    void feed_measurement_camera(double timestamp, std::vector<cv::Mat> &images, std::vector<size_t> &cam_ids);
+  /// Callback for synchronized stereo camera information
+  void callback_stereo(const sensor_msgs::ImageConstPtr &msg0, const sensor_msgs::ImageConstPtr &msg1, int cam_id0, int cam_id1);
 
-
-    /**
-     * @brief This will save the current map to disk!
-     * Should also re-run the extraction so we don't save the raw images...
-     */
-    void save_to_disk();
-
-
+  /**
+   * @brief This will save the current map to disk!
+   * Should also re-run the extraction so we don't save the raw images...
+   */
+  void save_to_disk();
 
 protected:
+  /**
+   * @brief Feed function for camera measurements
+   * @param message Contains our timestamp, images, and camera ids
+   */
+  void feed_measurement_camera(const ov_core::CameraData &message);
 
-    /// Our msckf filter estimator
-    VioManager* _app;
+  /// Our msckf filter estimator
+  std::shared_ptr<VioManager> _app;
 
-    /// Viomanger options and parameters
-    VioManagerOptions _params;
+  /// Viomanger options and parameters
+  VioManagerOptions _params;
 
-    /// Master map object that we want to save data into
-    vi_map::VIMap* map;
+  /// Master map object that we want to save data into
+  vi_map::VIMap *map;
 
-    /// Our camera rig
-    std::shared_ptr<aslam::NCamera> camera_rig;
+  // Feature tracker
+  feature_tracking::VOFeatureTrackingPipeline *trackpipe;
 
-    /// Master online stream builder
-    online_map_builders::StreamMapBuilder* builder;
+  /// Master online stream builder
+  online_map_builders::StreamMapBuilder *builder;
 
-    /// Our history of IMU messages (time, angular, linear)
-    std::vector<Propagator::IMUDATA> imu_data;
+  /// Sensor manager (cameras and IMU)
+  vi_map::SensorManager *sensor_manager;
 
-    /// Estimate for time offset at last propagation time
-    double last_prop_time_offset = 0;
+  /// Our history of IMU messages (time, angular, linear)
+  std::vector<ov_core::ImuData> imu_data;
 
-    /// Last timestamp that we updated at
-    double last_timestamp = -1;
+  /// Our history of CAMERA messages
+  std::map<double, ov_core::CameraData> camera_data;
 
-    /// Save folder
-    std::string save_folder;
+  /// Estimate for time offset at last propagation time
+  double last_prop_time_offset = 0;
 
-    /**
-     * @brief Nice helper function that will linearly interpolate between two imu messages.
-     *
-     * This should be used instead of just "cutting" imu messages that bound the camera times
-     * Give better time offset if we use this function, could try other orders/splines if the imu is slow.
-     *
-     * @param imu_1 imu at beggining of interpolation interval
-     * @param imu_2 imu at end of interpolation interval
-     * @param timestamp Timestamp being interpolated to
-     */
-    Propagator::IMUDATA interpolate_data(const Propagator::IMUDATA imu_1, const Propagator::IMUDATA imu_2, double timestamp) {
-        // time-distance lambda
-        double lambda = (timestamp - imu_1.timestamp) / (imu_2.timestamp - imu_1.timestamp);
-        //cout << "lambda - " << lambda << endl;
-        // interpolate between the two times
-        Propagator::IMUDATA data;
-        data.timestamp = timestamp;
-        data.am = (1 - lambda) * imu_1.am + lambda * imu_2.am;
-        data.wm = (1 - lambda) * imu_1.wm + lambda * imu_2.wm;
-        return data;
-    }
+  /// Last timestamp that we updated at
+  double last_timestamp = -1;
 
+  /// Last nframe with all images
+  aslam::VisualNFrame::Ptr last_nframe = nullptr;
+
+  /// Last VIO state
+  vio::ViNodeState last_vinode;
+
+  /// Save folder
+  std::string save_folder;
 };
 
-
-#endif //OV_MAPLAB_MAPBUILDER_H
+#endif // OV_MAPLAB_MAPBUILDER_H

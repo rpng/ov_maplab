@@ -1,0 +1,60 @@
+<launch>
+
+    <!-- what config we are going to run (should match folder name) -->
+    <arg name="verbosity"   default="INFO" /> <!-- ALL, DEBUG, INFO, WARNING, ERROR, SILENT -->
+    <arg name="config"      default="euroc_mav" /> <!-- euroc_mav, tum_vi, rpng_aruco -->
+    <arg name="config_path" default="$(find ov_msckf)/../config/$(arg config)/estimator_config.yaml" />
+
+    <!-- feature tracking settings -->
+    <arg name="max_cameras" default="2" />
+    <arg name="use_stereo"  default="true" />
+
+    <!-- what ros bag to play -->
+    <arg name="bag_start"   default="0" /> <!-- v1-2: 0, mh1: 40, mh2: 35, mh3: 17.5, mh4-5: 15 -->
+    <arg name="bag_durr"    default="-1" /> <!-- -1 for complete bag -->
+    <arg name="dataset"     default="V1_03_difficult" /> <!-- V1_01_easy, V1_02_medium, V1_03_difficult -->
+
+    <!-- DOCKER: REMEMBER THIS IS INSIDE THE DOCKER CONTAINER!!!!!! -->
+    <!-- DOCKER: THUS YOU SHOULDN'T CHANGE IT AS WE MOUNT A DATASET FOLDER -->
+    <!-- DOCKER: WE MOUNT WITH "type=bind,source=$DOCKER_DATASETS,target=/datasets" -->
+    <arg name="bag"         default="/datasets/$(arg config)/$(arg dataset).bag" />
+    <arg name="mapfolder"   default="/datasets/$(arg config)/maplab/$(arg dataset)/" />
+
+    <!-- if we should viz the groundtruth -->
+    <arg name="dolivetraj"  default="false" />
+    <arg name="path_gt"     default="$(find ov_data)/$(arg config)/$(arg dataset).txt" />
+
+    <!-- MASTER NODE! -->
+<!--    <node name="ros1_serial_msckf" pkg="ov_maplab" type="ros1_serial_msckf" output="screen" clear_params="true" required="true" launch-prefix="gdb -ex run &#45;&#45;args">-->
+    <node name="ros1_serial_msckf" pkg="ov_maplab" type="ros1_serial_msckf" output="screen" clear_params="true" required="true">
+
+        <!-- save for map building -->
+        <param name="map_save_folder"  type="string"   value="$(arg mapfolder)" />
+
+        <!-- bag parameters -->
+        <param name="path_bag"                 type="str"    value="$(arg bag)" />
+        <param name="bag_start"                type="double" value="$(arg bag_start)" />
+        <param name="bag_durr"                 type="int"    value="$(arg bag_durr)" />
+
+        <!-- master configuration object -->
+        <param name="verbosity"                 type="str"    value="$(arg verbosity)" />
+        <param name="config_path"               type="str"    value="$(arg config_path)" />
+
+        <!-- world/filter parameters -->
+        <param name="use_stereo"                type="bool"   value="$(arg use_stereo)" />
+        <param name="max_cameras"               type="int"    value="$(arg max_cameras)" />
+
+    </node>
+
+    <!-- rviz display -->
+    <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ov_msckf)/launch/display.rviz"/> -->
+
+    <!-- path viz of aligned gt -->
+    <group if="$(arg dolivetraj)">
+        <node name="live_align_trajectory" pkg="ov_eval" type="live_align_trajectory" output="log" clear_params="true">
+            <param name="alignment_type" type="str" value="posyaw" />
+            <param name="path_gt"        type="str" value="$(arg path_gt)" />
+        </node>
+    </group>
+
+</launch>

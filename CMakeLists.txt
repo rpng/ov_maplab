@@ -1,10 +1,7 @@
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.12)
 
 # Project name
 project(ov_maplab)
-
-# Include our cmake files
-#set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
 
 # Find catkin (the ROS build system)
 find_package(catkin REQUIRED COMPONENTS roscpp rosbag tf std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs cv_bridge ov_core ov_msckf vi_map vio_common feature_tracking online_map_builders console_common)
@@ -14,11 +11,7 @@ add_definitions(-DROS_AVAILABLE=1)
 find_package(Eigen3 REQUIRED)
 find_package(OpenCV 3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem thread date_time)
-
-# display message to user
-message(STATUS "EIGEN VERSION: " ${EIGEN3_VERSION})
-message(STATUS "OPENCV VERSION: " ${OpenCV_VERSION})
-message(STATUS "BOOST VERSION: " ${Boost_VERSION})
+message(STATUS "OPENCV: " ${OpenCV_VERSION} " | BOOST: " ${Boost_VERSION})
 
 # Describe catkin project
 catkin_package(
@@ -26,18 +19,11 @@ catkin_package(
         INCLUDE_DIRS src
 )
 
-# Try to compile with c++11
-# http://stackoverflow.com/a/25836953
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
+# We need c++14 for ROS2, thus just require it for everybody
+# NOTE: To future self, hope this isn't an issue...
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Enable compile optimizations
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fsee -fomit-frame-pointer -fno-signed-zeros -fno-math-errno -funroll-loops")
@@ -64,7 +50,7 @@ list(APPEND thirdparty_libraries
 # Make the core library
 ##################################################
 add_library(ov_maplab_lib
-    src/mapper/MapBuilder.cpp
+        src/mapper/MapBuilder.cpp
 )
 target_link_libraries(ov_maplab_lib ${thirdparty_libraries})
 
@@ -72,16 +58,15 @@ target_link_libraries(ov_maplab_lib ${thirdparty_libraries})
 ##################################################
 # Make binary files!
 ##################################################
-add_executable(run_serial_msckf src/run_serial_msckf.cpp)
-target_link_libraries(run_serial_msckf ov_maplab_lib ${thirdparty_libraries})
 
-
-
+add_executable(ros1_serial_msckf src/ros1_serial_msckf.cpp)
+target_link_libraries(ros1_serial_msckf ov_maplab_lib ${thirdparty_libraries})
 
 
 ##################################################
 # maplab console plugin
 ##################################################
+
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 add_definitions(-fPIC -shared)
