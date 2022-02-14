@@ -52,7 +52,7 @@ cd catkin_ws/
 catkin init
 catkin config --merge-devel
 catkin config --extend /opt/ros/melodic
-catkin build maplab ov_maplab -j4
+catkin build maplab ov_maplab ov_data -j4
 catkin build ov_maplab -j4 --no-deps # after first build
 source devel/setup.bash
 ```
