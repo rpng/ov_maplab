@@ -222,6 +222,8 @@ int main(int argc, char **argv) {
       builder->callback_inertial(msg_imu_current);
       msg_imu_current = msg_imu_next;
       view_imu_iter++;
+      if (view_imu_iter == view_imu->end())
+        break;
       msg_imu_next = view_imu_iter->instantiate<sensor_msgs::Imu>();
       continue;
     }
