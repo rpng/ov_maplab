@@ -1,6 +1,6 @@
 # OpenVINS Maplab Interface
 
-Here we have our interface wrapper for exporting visual-inertial runs from [OpenVINS](https://github.com/rpng/open_vins) into the ViMap structure taken by [maplab](https://github.com/ethz-asl/maplab). The state estimates and raw images are appended to the ViMap as OpenVINS runs through a dataset. After completion of the dataset, we re-extract features and triangulate them due to the incompatibilities of the two frontends. Maplab requires BRISK or FREAK descriptors, while OpenVINS works with KLT or ORB feature tracking. In the future we will try to only extract descriptors on tracked features from OpenVINS, but for now we just re-detect for simplicity. We have tested this on the [EurocMav](https://docs.openvins.com/gs-datasets.html#gs-data-euroc) and [TUM-VI](https://docs.openvins.com/gs-datasets.html#gs-data-tumvi) datasets and have had good success with merging the different runs and optimizing the resulting graph.
+Here we have our interface wrapper for exporting visual-inertial runs from [OpenVINS](https://github.com/rpng/open_vins) into the ViMap structure taken by [maplab](https://github.com/ethz-asl/maplab). The state estimates and raw images are appended to the ViMap as OpenVINS runs through a dataset. After completion of the dataset, we re-extract features and triangulate them due to the incompatibilities of the two frontends. Maplab requires BRISK or FREAK descriptors, while OpenVINS works with KLT or ORB feature tracking. In the future we will try to only extract descriptors on tracked features from OpenVINS, but for now we just re-detect for simplicity. We have tested this on the [EurocMav](https://docs.openvins.com/gs-datasets.html#gs-data-euroc) and [TUM-VI](https://docs.openvins.com/gs-datasets.html#gs-data-tumvi) datasets and have had good success with merging the different runs and optimizing the resulting graph. To ensure that we are able to compile maplab, we provide a [docker image](Dockerfile) for Ubuntu 18.04 which has all dependencies required.
 
 ## Dependencies
 
@@ -53,7 +53,7 @@ cd catkin_ws/
 catkin init
 catkin config --merge-devel
 catkin config --extend /opt/ros/melodic
-catkin build maplab ov_maplab -j4
+catkin build maplab ov_maplab ov_data -j4
 catkin build ov_maplab -j4 --no-deps # after first build
 source devel/setup.bash
 ```
@@ -148,7 +148,8 @@ Example map merging of the room1, room2, room3, and corridor1 from the TUM-VI da
 ![example tumvi](docs/2019-08-21_13-38-24.png)
 
 Example map merging of the aruco_hallway_02 and aruco_hallway_02 from the RPNG aruco datasets (before left and after right):
-![example before](docs/aruco_before.png)![example before](docs/aruco_after.png)
+
+<img src="docs/aruco_before.png" width="49%"/> <img src="docs/aruco_after.png" width="49%"/> 
 
 
 
