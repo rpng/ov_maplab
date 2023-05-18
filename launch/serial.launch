@@ -25,8 +25,8 @@
     <arg name="path_gt"     default="$(find ov_data)/$(arg config)/$(arg dataset).txt" />
 
     <!-- MASTER NODE! -->
-<!--    <node name="ros1_serial_msckf" pkg="ov_maplab" type="ros1_serial_msckf" output="screen" clear_params="true" required="true" launch-prefix="gdb -ex run &#45;&#45;args">-->
-    <node name="ros1_serial_msckf" pkg="ov_maplab" type="ros1_serial_msckf" output="screen" clear_params="true" required="true">
+<!--    <node name="ov_msckf" pkg="ov_maplab" type="ros1_serial_msckf" output="screen" clear_params="true" required="true" launch-prefix="gdb -ex run &#45;&#45;args">-->
+    <node name="ov_msckf" pkg="ov_maplab" type="ros1_serial_msckf" output="screen" clear_params="true" required="true">
 
         <!-- save for map building -->
         <param name="map_save_folder"  type="string"   value="$(arg mapfolder)" />

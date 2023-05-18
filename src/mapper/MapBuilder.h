@@ -51,7 +51,10 @@
 #include "core/VioManager.h"
 #include "core/VioManagerOptions.h"
 #include "state/Propagator.h"
+#include "state/State.h"
+
 #include "utils/print.h"
+#include "utils/sensor_data.h"
 
 using namespace ov_msckf;
 

@@ -4,32 +4,33 @@ Here we have our interface wrapper for exporting visual-inertial runs from [Open
 
 ## Dependencies
 
-* OpenVINS (v2.5 release) - https://docs.openvins.com/gs-installing.html
-* maplab (develop branch) - https://github.com/ethz-asl/maplab/wiki/Installation-Ubuntu
+* OpenVINS (v2.7 release) - https://docs.openvins.com/gs-installing.html
+* maplab (develop v1, 18.04 release) - https://github.com/ethz-asl/maplab/wiki/Installation-Ubuntu
 * Docker - https://docs.docker.com/get-docker/
 
 ## Installation Guide
 
 Clone and setup workspace:
-```
+```bash
 # setup our workspace and clone
 mkdir -p catkin_ws_maplab/src/
 cd catkin_ws_maplab/src/
 git clone https://github.com/rpng/ov_maplab.git
 git clone https://github.com/rpng/open_vins.git
 git clone https://github.com/ethz-asl/maplab.git --recursive
-# switch maplab branch to "18.04 develop"
+# switch open_vins to last tested commit (might build with newer)
+cd open_vins/
+git checkout 2b506eeedd0b158c014641b9240a62ae80f6d7a0
+cd ..
+# switch maplab to last tested commit (might build with newer)
 cd maplab/
-git checkout develop
-git pull origin develop
+git checkout 483daf4988a76c15be362fd017ec78581c4f88d9
 git submodule update --init --recursive
-rm -rf tools/linter/ # might not need this, check with git status
-rm -rf tools/maplab_test_data/ # might not need this, check with git status
 cd ..
 ```
 
 Build the docker image:
-```
+```bash
 cd ov_maplab/
 docker build -t ov_maplab .
 nano ~/.bashrc
@@ -46,7 +47,7 @@ cd ..
 ```
 
 Build maplab, OpenVINS, and ov_maplab in the container:
-```
+```bash
 ov_docker ov_maplab bash
 cd catkin_ws/
 catkin init
@@ -62,7 +63,7 @@ source devel/setup.bash
 ## Processing Map Example
 
 Load into docker bash shell and run OpenVINS:
-```
+```bash
 ov_docker ov_maplab bash
 cd catkin_ws/
 source devel/setup.bash
@@ -71,7 +72,7 @@ roslaunch ov_maplab serial.launch config:=euroc_mav dataset:=V1_02_medium
 ```
 
 Load and process the generated map:
-```
+```bash
 # load into the main console
 rosrun maplab_console maplab_console
 # load all our maps and join them (they should each be a mission)
@@ -109,7 +110,7 @@ A use case is if one wishes to use maplab optimized and loop-closed trajectory a
 
 
 Load into docker bash shell and run OpenVINS:
-```
+```bash
 # load into docker bash
 ov_docker ov_maplab bash
 cd catkin_ws/
@@ -120,7 +121,7 @@ roslaunch ov_maplab serial.launch config:=euroc_mav dataset:=V1_02_medium
 
 
 Process and export an optimized map:
-```
+```bash
 # load the map into maplab
 rosrun maplab_console maplab_console
 load --map_folder /datasets/euroc_mav/maplab/V1_02_medium/
@@ -133,7 +134,7 @@ relax
 visualize
 optimize_visual_inertial --ba_num_iterations=25 --ba_visualize_every_n_iterations=1
 # finally, we can export using our custom utility
-# this will get it into our space seperated format needed for ov_eval
+# this will get it into our space separated format needed for ov_eval
 export_to_openvins --export_path /datasets/euroc_mav/maplab/
 ```
 
