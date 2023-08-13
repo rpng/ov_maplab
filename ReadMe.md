@@ -20,11 +20,11 @@ git clone https://github.com/rpng/open_vins.git
 git clone https://github.com/ethz-asl/maplab.git --recursive
 # switch open_vins to last tested commit (might build with newer)
 cd open_vins/
-git checkout 2b506eeedd0b158c014641b9240a62ae80f6d7a0
+git checkout 4534a2f32d4763bdc8c95121b3292c7423e12aca
 cd ..
 # switch maplab to last tested commit (might build with newer)
 cd maplab/
-git checkout 483daf4988a76c15be362fd017ec78581c4f88d9
+git checkout 0b4868efeb292851d71f98d31a1e6bb40ebb244b
 git submodule update --init --recursive
 cd ..
 ```
@@ -52,8 +52,8 @@ ov_docker ov_maplab bash
 cd catkin_ws/
 catkin init
 catkin config --merge-devel
-catkin config --extend /opt/ros/melodic
-catkin build maplab ov_maplab ov_data -j4
+catkin config --extend /opt/ros/noetic
+catkin build maplab ov_maplab -j4
 catkin build ov_maplab -j4 --no-deps # after first build
 source devel/setup.bash
 ```
