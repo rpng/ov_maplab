@@ -1,0 +1,55 @@
+Errors     << feature_tracking:make /catkin_ws/logs/feature_tracking/build.make.001.log                                                                  
+In file included from /catkin_ws/src/maplab/algorithms/feature-tracking/src/feature-tracking-types.cc:5:0:
+/catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/feature-tracking-types.h:50:12: error: ‘ScoreType’ in ‘class cv::ORB’ does not name a type
+   cv::ORB::ScoreType orb_detector_score_type;
+            ^~~~~~~~~
+/catkin_ws/src/maplab/algorithms/feature-tracking/src/feature-tracking-types.cc: In constructor ‘feature_tracking::FeatureTrackingDetectorSettings::FeatureTrackingDetectorSettings()’:
+/catkin_ws/src/maplab/algorithms/feature-tracking/src/feature-tracking-types.cc:157:7: error: class ‘feature_tracking::FeatureTrackingDetectorSettings’ does not have any field named ‘orb_detector_score_type’
+       orb_detector_score_type(cv::ORB::ScoreType::HARRIS_SCORE),
+       ^~~~~~~~~~~~~~~~~~~~~~~
+/catkin_ws/src/maplab/algorithms/feature-tracking/src/feature-tracking-types.cc:157:40: error: ‘cv::ORB::ScoreType’ has not been declared
+       orb_detector_score_type(cv::ORB::ScoreType::HARRIS_SCORE),
+                                        ^~~~~~~~~
+make[2]: *** [CMakeFiles/feature_tracking.dir/src/feature-tracking-types.cc.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+In file included from /catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/feature-detection-extraction.h:12:0,
+                 from /catkin_ws/src/maplab/algorithms/feature-tracking/src/feature-detection-extraction.cc:3:
+/catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/feature-tracking-types.h:50:12: error: ‘ScoreType’ in ‘class cv::ORB’ does not name a type
+   cv::ORB::ScoreType orb_detector_score_type;
+            ^~~~~~~~~
+/catkin_ws/src/maplab/algorithms/feature-tracking/src/feature-detection-extraction.cc: In member function ‘void feature_tracking::FeatureDetectorExtractor::initialize()’:
+/catkin_ws/src/maplab/algorithms/feature-tracking/src/feature-detection-extraction.cc:49:26: error: ‘const struct feature_tracking::FeatureTrackingDetectorSettings’ has no member named ‘orb_detector_score_type’; did you mean ‘orb_detector_scale_factor’?
+       detector_settings_.orb_detector_score_type,
+                          ^~~~~~~~~~~~~~~~~~~~~~~
+                          orb_detector_scale_factor
+make[2]: *** [CMakeFiles/feature_tracking.dir/src/feature-detection-extraction.cc.o] Error 1
+In file included from /catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/vo-outlier-rejection-pipeline.h:8:0,
+                 from /catkin_ws/src/maplab/algorithms/feature-tracking/src/vo-outlier-rejection-pipeline.cc:6:
+/catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/feature-tracking-types.h:50:12: error: ‘ScoreType’ in ‘class cv::ORB’ does not name a type
+   cv::ORB::ScoreType orb_detector_score_type;
+            ^~~~~~~~~
+In file included from /catkin_ws/src/maplab/algorithms/feature-tracking/src/vo-outlier-rejection-pipeline.cc:6:0:
+/catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/vo-outlier-rejection-pipeline.h: In constructor ‘feature_tracking::VOOutlierRejectionPipeline::VOOutlierRejectionPipeline(const ConstPtr&, int, const Quaternion&, vi_map::FeatureType, const feature_tracking::FeatureTrackingOutlierSettings&)’:
+/catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/vo-outlier-rejection-pipeline.h:55:40: warning: ‘feature_tracking::VOOutlierRejectionPipeline::outlier_settings_’ will be initialized after [-Wreorder]
+   const FeatureTrackingOutlierSettings outlier_settings_;
+                                        ^~~~~~~~~~~~~~~~~
+/catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/vo-outlier-rejection-pipeline.h:38:8: warning:   ‘bool feature_tracking::VOOutlierRejectionPipeline::initialized_’ [-Wreorder]
+   bool initialized_;
+        ^~~~~~~~~~~~
+/catkin_ws/src/maplab/algorithms/feature-tracking/src/vo-outlier-rejection-pipeline.cc:10:1: warning:   when initialized here [-Wreorder]
+ VOOutlierRejectionPipeline::VOOutlierRejectionPipeline(
+ ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/feature-detection-extraction.h:12:0,
+                 from /catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/vo-feature-tracking-pipeline.h:15,
+                 from /catkin_ws/src/maplab/algorithms/feature-tracking/src/vo-feature-tracking-pipeline.cc:10:
+/catkin_ws/src/maplab/algorithms/feature-tracking/include/feature-tracking/feature-tracking-types.h:50:12: error: ‘ScoreType’ in ‘class cv::ORB’ does not name a type
+   cv::ORB::ScoreType orb_detector_score_type;
+            ^~~~~~~~~
+make[2]: *** [CMakeFiles/feature_tracking.dir/src/vo-feature-tracking-pipeline.cc.o] Error 1
+make[2]: *** [CMakeFiles/feature_tracking.dir/src/vo-outlier-rejection-pipeline.cc.o] Error 1
+make[1]: *** [CMakeFiles/feature_tracking.dir/all] Error 2
+make: *** [all] Error 2
+cd /catkin_ws/build/feature_tracking; catkin build --get-env feature_tracking | catkin env -si  /usr/bin/make --jobserver-fds=6,7 -j; cd -
+.........................................................................................................................................................
+Failed     << feature_tracking:make                           [ Exited with code 2 ]                                                                     
+Failed    <<< feature_tracking                                [ 15.5 seconds ]    

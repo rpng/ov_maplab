@@ -2,7 +2,7 @@ name: ROS 1 Workflow
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, test2004 ]
   pull_request:
 
 jobs:
