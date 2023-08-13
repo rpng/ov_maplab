@@ -7,7 +7,7 @@ Here we have our interface wrapper for exporting visual-inertial runs from [Open
 ## Dependencies
 
 * OpenVINS (v2.7 release) - https://docs.openvins.com/gs-installing.html
-* maplab (develop v1, 18.04 release) - https://github.com/ethz-asl/maplab/wiki/Installation-Ubuntu
+* maplab (develop v2, 20.04 release) - https://github.com/ethz-asl/maplab/wiki/Installation-Ubuntu
 * Docker - https://docs.docker.com/get-docker/
 
 ## Installation Guide
