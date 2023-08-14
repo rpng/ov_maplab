@@ -26,26 +26,26 @@ bagnames=(
 
 big_start_time="$(date -u +%s)"
 
-## Loop through all datasets
-#for i in "${!bagnames[@]}"; do
-#
-## start timing
-#start_time="$(date -u +%s)"
-#
-## run our ROS launch file (note we send console output to terminator)
-#roslaunch ov_maplab serial.launch \
-#  max_cameras:="1" \
-#  use_stereo:="true" \
-#  config:="rpng_plane" \
-#  dataset:="${bagnames[i]}" \
-#  dolivetraj:="true" &> /dev/null
-#
-## print out the time elapsed
-#end_time="$(date -u +%s)"
-#elapsed="$(($end_time-$start_time))"
-#echo "BASH: ${bagnames[i]} - vio took $elapsed seconds";
-#
-#done
+# Loop through all datasets
+for i in "${!bagnames[@]}"; do
+
+# start timing
+start_time="$(date -u +%s)"
+
+# run our ROS launch file (note we send console output to terminator)
+roslaunch ov_maplab serial.launch \
+  max_cameras:="1" \
+  use_stereo:="true" \
+  config:="rpng_plane" \
+  dataset:="${bagnames[i]}" \
+  dolivetraj:="true" &> /dev/null
+
+# print out the time elapsed
+end_time="$(date -u +%s)"
+elapsed="$(($end_time-$start_time))"
+echo "BASH: ${bagnames[i]} - vio took $elapsed seconds";
+
+done
 
 # start timing
 start_time="$(date -u +%s)"
