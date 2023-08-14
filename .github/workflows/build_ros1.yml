@@ -1,0 +1,36 @@
+name: ROS 1 Workflow
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  build_2004:
+    name: "ROS1 Ubuntu 20.04"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Reconfigure git to use HTTP authentication
+        run: |
+          git config --global url."https://github.com/".insteadOf git@github.com: &&
+          git config --global url."https://".insteadOf git://
+      - name: Create Workspace and Docker Image
+        run: |
+          export REPO=$(basename $GITHUB_REPOSITORY) &&
+          cd $GITHUB_WORKSPACE/.. && mkdir src/ && cd src/ &&
+          git clone https://github.com/rpng/open_vins.git &&
+          git clone https://github.com/ethz-asl/maplab.git --recursive &&
+          cd .. && mv $REPO/ src/ && mkdir $REPO/ && mv src/ $REPO/ && cd $REPO/ &&
+          docker build -t ov_maplab -f $GITHUB_WORKSPACE/src/$REPO/Dockerfile_ros1_20_04 .
+      - name: Run Build in Docker
+        run: >
+          docker run -t --mount type=bind,source=$GITHUB_WORKSPACE,target=/catkin_ws ov_maplab /bin/bash -c
+          "cd /catkin_ws
+          && catkin init
+          && catkin config --merge-devel
+          && catkin config --extend /opt/ros/noetic
+          && catkin build ov_maplab"
+
+

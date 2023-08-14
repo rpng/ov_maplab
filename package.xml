@@ -29,6 +29,7 @@
     <build_depend>visualization_msgs</build_depend>
     <build_depend>cv_bridge</build_depend>
     <build_depend>ov_core</build_depend>
+    <build_depend>ov_data</build_depend>
     <build_depend>ov_msckf</build_depend>
     <build_depend>vi_map</build_depend>
     <build_depend>vio_common</build_depend>
@@ -48,6 +49,8 @@
     <run_depend>visualization_msgs</run_depend>
     <run_depend>cv_bridge</run_depend>
     <run_depend>ov_core</run_depend>
+    <run_depend>ov_data</run_depend>
+    <run_depend>ov_eval</run_depend>
     <run_depend>ov_msckf</run_depend>
     <run_depend>vi_map</run_depend>
     <run_depend>vio_common</run_depend>

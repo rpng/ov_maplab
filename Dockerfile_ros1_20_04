@@ -1,4 +1,4 @@
-FROM osrf/ros:melodic-desktop-full
+FROM osrf/ros:noetic-desktop-full
 
 # =========================================================
 # =========================================================
@@ -14,14 +14,25 @@ FROM osrf/ros:melodic-desktop-full
 # Dependencies we use, catkin tools is very good build system
 # Also some helper utilities for fast in terminal edits (nano etc)
 RUN apt-get update && apt-get install -y libeigen3-dev nano git
-RUN sudo apt-get install -y python-catkin-tools
+RUN sudo apt-get install -y python3-catkin-tools python3-osrf-pycommon
 
-# Seems this has Python 3.6 installed on it...
-RUN sudo apt-get install -y python3-dev python3-matplotlib python3-numpy python3-psutil python3-tk
+# Ceres solver install and setup
+RUN sudo apt-get install -y cmake libgoogle-glog-dev libgflags-dev libatlas-base-dev libeigen3-dev libsuitesparse-dev libceres-dev
+# ENV CERES_VERSION="2.0.0"
+# RUN git clone https://ceres-solver.googlesource.com/ceres-solver && \
+#     cd ceres-solver && \
+#     git checkout tags/${CERES_VERSION} && \
+#     mkdir build && cd build && \
+#     cmake .. && \
+#     make -j$(nproc) install && \
+#     rm -rf ../../ceres-solver
+
+# Seems this has Python 3.8 installed on it...
+RUN apt-get update && apt-get install -y python3-dev python3-matplotlib python3-numpy python3-psutil python3-tk
 
 # Maplab dependecies
 # https://github.com/ethz-asl/maplab/wiki/Installation-Ubuntu
-RUN sudo apt install -y autotools-dev ccache doxygen dh-autoreconf git liblapack-dev libblas-dev libgtest-dev libreadline-dev libssh2-1-dev pylint clang-format python-autopep8 python-catkin-tools python-pip python-git python-setuptools python-termcolor python-wstool libatlas3-base
+RUN sudo apt install -y autotools-dev ccache doxygen dh-autoreconf git liblapack-dev libblas-dev libgtest-dev libreadline-dev libssh2-1-dev pylint clang-format-6.0 python3-autopep8 python3-catkin-tools python3-pip python3-git python3-setuptools python3-termcolor python3-wstool libatlas3-base libv4l-dev
 RUN sudo pip install requests
 
 # Install CMake 3.13.5
@@ -33,7 +44,7 @@ RUN cmake --version
 
 # Install deps needed for clion remote debugging
 # https://blog.jetbrains.com/clion/2020/01/using-docker-with-clion/
-RUN sed -i '6i\source "/catkin_ws/devel/setup.bash"\' /ros_entrypoint.sh
+# RUN sed -i '6i\source "/catkin_ws/devel/setup.bash"\' /ros_entrypoint.sh
 RUN apt-get update && apt-get install -y ssh build-essential gcc g++ \
     gdb clang cmake rsync tar python && apt-get clean
 RUN ( \

@@ -37,7 +37,7 @@ MapBuilder::MapBuilder(std::shared_ptr<ros::NodeHandle> nh, std::shared_ptr<VioM
   aslam::TransformationVector T_ItoCi, T_CitoI;
   std::vector<std::shared_ptr<aslam::Camera>> cameras;
 
-  // Loop through through, and load each of the cameras
+  // Loop through, and load each of the cameras
   std::stringstream ss;
   for (int i = 0; i < _params.state_options.num_cameras; i++) {
 
@@ -94,7 +94,7 @@ MapBuilder::MapBuilder(std::shared_ptr<ros::NodeHandle> nh, std::shared_ptr<VioM
   // NOTE: Camera transformations are already relative to base sensor, so identity transform here
   sensor_manager = new vi_map::SensorManager();
   sensor_manager->addSensorAsBase<vi_map::Imu>(std::move(imu_sensor));
-  //sensor_manager->addSensor<aslam::NCamera>(std::move(ncamera), imu_sensor_id, T_CitoI.at(0));
+  // sensor_manager->addSensor<aslam::NCamera>(std::move(ncamera), imu_sensor_id, T_CitoI.at(0));
   sensor_manager->addSensor<aslam::NCamera>(std::move(ncamera), imu_sensor_id, aslam::Transformation());
 
   // Create the master map object
@@ -111,7 +111,8 @@ MapBuilder::MapBuilder(std::shared_ptr<ros::NodeHandle> nh, std::shared_ptr<VioM
   feature_tracking::FeatureTrackingExtractorSettings extractor_settings;
   extractor_settings.rotation_invariant = true;
   feature_tracking::FeatureTrackingDetectorSettings detector_settings;
-  trackpipe = new feature_tracking::VOFeatureTrackingPipeline(camera_rig, extractor_settings, detector_settings);
+  feature_tracking::FeatureTrackingOutlierSettings outlier_settings;
+  trackpipe = new feature_tracking::VOFeatureTrackingPipeline(camera_rig, extractor_settings, detector_settings, outlier_settings);
 
   // Create our map builder
   // NOTE: always dump the images to disk
@@ -217,7 +218,16 @@ void MapBuilder::feed_measurement_camera(const ov_core::CameraData &message_tmp)
     return;
   }
   ov_core::CameraData message = camera_data.at(_app->get_state()->_timestamp);
-  camera_data.erase(_app->get_state()->_timestamp);
+
+  // Erase all older camera timestamps from our history
+  auto it0 = camera_data.begin();
+  while (it0 != camera_data.end()) {
+    if (it0->first <= _app->get_state()->_timestamp) {
+      it0 = camera_data.erase(it0);
+    } else {
+      it0++;
+    }
+  }
 
   // Get the current timestamp in the imu clock frame of reference
   double t_ItoC = _app->get_state()->_calib_dt_CAMtoIMU->value()(0);
@@ -254,7 +264,10 @@ void MapBuilder::feed_measurement_camera(const ov_core::CameraData &message_tmp)
 
   // Get IMU measurements between last and current vertex nodes
   // Also track features from the last frame to this one!
-  if (last_timestamp != -1) {
+  // The first ever frame doesn't need its pose just the feature tracks
+  if (last_timestamp == -1) {
+    trackpipe->initializeFirstNFrame(nframe.get());
+  } else {
 
     // First lets construct an IMU vector of measurements we need
     // TODO: delete old IMU measurements from here

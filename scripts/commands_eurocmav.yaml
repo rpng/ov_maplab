@@ -1,0 +1,30 @@
+
+vi_map_folder_paths:
+  - /datasets/euroc_mav/maplab/V1_01_easy
+  - /datasets/euroc_mav/maplab/V1_02_medium
+  - /datasets/euroc_mav/maplab/V1_03_difficult
+  - /datasets/euroc_mav/maplab/V2_01_easy
+  - /datasets/euroc_mav/maplab/V2_02_medium
+  - /datasets/euroc_mav/maplab/V2_03_difficult
+commands:
+  - load --map_folder=<CURRENT_VIMAP_FOLDER>
+  - retriangulate_landmarks
+  - v --vis_color_by_mission
+  - optvi --ba_num_iterations=5 -ba_visualize_every_n_iterations=1
+  - retriangulate_landmarks
+  - loopclosure_all_missions
+  - optvi --ba_num_iterations=5 -ba_visualize_every_n_iterations=1
+  - retriangulate_landmarks
+  - loopclosure_all_missions
+  - optvi --ba_num_iterations=30 -ba_visualize_every_n_iterations=5
+  - evaluate_landmark_quality
+  - remove_bad_landmarks
+  - save --map_folder=<CURRENT_VIMAP_FOLDER>_result
+  - export_to_openvins --overwrite --export_path=<CURRENT_VIMAP_FOLDER>_result
+  - export_trajectory_to_csv --overwrite --export_path=<CURRENT_VIMAP_FOLDER>_result
+  - keyframe_heuristic
+  - v --vis_color_by_mission
+  - save --map_folder=<CURRENT_VIMAP_FOLDER>_result_keyframed
+  - export_to_openvins --overwrite --export_path=<CURRENT_VIMAP_FOLDER>_result_keyframed
+  - export_trajectory_to_csv --overwrite --export_path=<CURRENT_VIMAP_FOLDER>_result_keyframed
+

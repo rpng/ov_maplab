@@ -1,11 +1,13 @@
 # OpenVINS Maplab Interface
 
-Here we have our interface wrapper for exporting visual-inertial runs from [OpenVINS](https://github.com/rpng/open_vins) into the ViMap structure taken by [maplab](https://github.com/ethz-asl/maplab). The state estimates and raw images are appended to the ViMap as OpenVINS runs through a dataset. After completion of the dataset, we re-extract features and triangulate them due to the incompatibilities of the two frontends. Maplab requires BRISK or FREAK descriptors, while OpenVINS works with KLT or ORB feature tracking. In the future we will try to only extract descriptors on tracked features from OpenVINS, but for now we just re-detect for simplicity. We have tested this on the [EurocMav](https://docs.openvins.com/gs-datasets.html#gs-data-euroc) and [TUM-VI](https://docs.openvins.com/gs-datasets.html#gs-data-tumvi) datasets and have had good success with merging the different runs and optimizing the resulting graph. To ensure that we are able to compile maplab, we provide a [docker image](Dockerfile) for Ubuntu 18.04 which has all dependencies required.
+[![ROS 1 Workflow](https://github.com/rpng/ov_maplab/actions/workflows/build_ros1.yml/badge.svg)](https://github.com/rpng/ov_maplab/actions/workflows/build_ros1.yml)
+
+Here we have our interface wrapper for exporting visual-inertial runs from [OpenVINS](https://github.com/rpng/open_vins) into the ViMap structure taken by [maplab](https://github.com/ethz-asl/maplab). The state estimates and raw images are appended to the ViMap as OpenVINS runs through a dataset. After completion of the dataset, we re-extract features and triangulate them due to the incompatibilities of the two frontends. Maplab requires BRISK or FREAK descriptors, while OpenVINS works with KLT or ORB feature tracking. In the future we will try to only extract descriptors on tracked features from OpenVINS, but for now we just re-detect for simplicity. We have tested this on the [EurocMav](https://docs.openvins.com/gs-datasets.html#gs-data-euroc) and [TUM-VI](https://docs.openvins.com/gs-datasets.html#gs-data-tumvi) datasets and have had good success with merging the different runs and optimizing the resulting graph. To ensure that we are able to compile maplab, we provide a [docker image](Dockerfile) for Ubuntu 20.04 which has all dependencies required.
 
 ## Dependencies
 
 * OpenVINS (v2.7 release) - https://docs.openvins.com/gs-installing.html
-* maplab (develop v1, 18.04 release) - https://github.com/ethz-asl/maplab/wiki/Installation-Ubuntu
+* maplab (v2.0, 20.04 release) - https://github.com/ethz-asl/maplab/wiki/Installation-Ubuntu
 * Docker - https://docs.docker.com/get-docker/
 
 ## Installation Guide
@@ -20,11 +22,11 @@ git clone https://github.com/rpng/open_vins.git
 git clone https://github.com/ethz-asl/maplab.git --recursive
 # switch open_vins to last tested commit (might build with newer)
 cd open_vins/
-git checkout 2b506eeedd0b158c014641b9240a62ae80f6d7a0
+git checkout 4534a2f32d4763bdc8c95121b3292c7423e12aca
 cd ..
 # switch maplab to last tested commit (might build with newer)
 cd maplab/
-git checkout 483daf4988a76c15be362fd017ec78581c4f88d9
+git checkout 0b4868efeb292851d71f98d31a1e6bb40ebb244b
 git submodule update --init --recursive
 cd ..
 ```
@@ -52,8 +54,9 @@ ov_docker ov_maplab bash
 cd catkin_ws/
 catkin init
 catkin config --merge-devel
-catkin config --extend /opt/ros/melodic
-catkin build maplab ov_maplab ov_data -j4
+catkin config --extend /opt/ros/noetic
+catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+catkin build maplab ov_maplab -j4
 catkin build ov_maplab -j4 --no-deps # after first build
 source devel/setup.bash
 ```

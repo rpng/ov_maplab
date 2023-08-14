@@ -7,11 +7,16 @@ project(ov_maplab)
 find_package(catkin REQUIRED COMPONENTS roscpp rosbag tf std_msgs geometry_msgs sensor_msgs nav_msgs visualization_msgs cv_bridge ov_core ov_msckf vi_map vio_common feature_tracking online_map_builders console_common)
 add_definitions(-DROS_AVAILABLE=1)
 
-# Include libraries
+# Include libraries (if we don't have opencv 4, then fallback to opencv 3)
+# The OpenCV version needs to match the one used by cv_bridge otherwise you will get a segmentation fault!
 find_package(Eigen3 REQUIRED)
-find_package(OpenCV 3 REQUIRED)
+find_package(OpenCV 3 QUIET)
+if (NOT OpenCV_FOUND)
+    find_package(OpenCV 4 REQUIRED)
+endif ()
 find_package(Boost REQUIRED COMPONENTS system filesystem thread date_time)
-message(STATUS "OPENCV: " ${OpenCV_VERSION} " | BOOST: " ${Boost_VERSION})
+find_package(Ceres REQUIRED)
+message(STATUS "OPENCV: " ${OpenCV_VERSION} " | BOOST: " ${Boost_VERSION} " | CERES: " ${Ceres_VERSION})
 
 # Describe catkin project
 catkin_package(
@@ -36,6 +41,7 @@ include_directories(
         src
         ${EIGEN3_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
+        ${CERES_INCLUDE_DIRS}
         ${catkin_INCLUDE_DIRS}
 )
 
@@ -43,6 +49,7 @@ include_directories(
 list(APPEND thirdparty_libraries
         ${Boost_LIBRARIES}
         ${OpenCV_LIBRARIES}
+        ${CERES_LIBRARIES}
         ${catkin_LIBRARIES}
 )
 
