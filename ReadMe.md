@@ -55,6 +55,7 @@ cd catkin_ws/
 catkin init
 catkin config --merge-devel
 catkin config --extend /opt/ros/noetic
+catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
 catkin build maplab ov_maplab -j4
 catkin build ov_maplab -j4 --no-deps # after first build
 source devel/setup.bash
