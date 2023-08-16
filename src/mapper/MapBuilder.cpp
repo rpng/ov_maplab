@@ -84,6 +84,7 @@ MapBuilder::MapBuilder(std::shared_ptr<ros::NodeHandle> nh, std::shared_ptr<VioM
   aslam::SensorId imu_sensor_id = aslam::createRandomId<aslam::SensorId>();
   vi_map::Imu::UniquePtr imu_sensor = aligned_unique<vi_map::Imu>(imu_sensor_id, static_cast<std::string>(kImuHardwareId));
   imu_sensor->setImuSigmas(imu_sigmas);
+  imu_sensor->setGravityMagnitude(_params.gravity_mag);
 
   // Create our camera object
   std::string cam_label = "ncameras";

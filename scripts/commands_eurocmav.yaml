@@ -1,22 +1,26 @@
 
 vi_map_folder_paths:
-  - /datasets/euroc_mav/maplab/V1_01_easy
-  - /datasets/euroc_mav/maplab/V1_02_medium
-  - /datasets/euroc_mav/maplab/V1_03_difficult
-  - /datasets/euroc_mav/maplab/V2_01_easy
-  - /datasets/euroc_mav/maplab/V2_02_medium
-  - /datasets/euroc_mav/maplab/V2_03_difficult
+  - /datasets/euroc_mav/maplab/raw_maps/V1_01_easy
+  - /datasets/euroc_mav/maplab/raw_maps/V1_02_medium
+  - /datasets/euroc_mav/maplab/raw_maps/V1_03_difficult
+  - /datasets/euroc_mav/maplab/raw_maps/V2_01_easy
+  - /datasets/euroc_mav/maplab/raw_maps/V2_02_medium
+  - /datasets/euroc_mav/maplab/raw_maps/V2_03_difficult
 commands:
   - load --map_folder=<CURRENT_VIMAP_FOLDER>
   - retriangulate_landmarks
   - v --vis_color_by_mission
   - optvi --ba_num_iterations=5 -ba_visualize_every_n_iterations=1
+  - remove_invalid_observations
+  - evaluate_landmark_quality
+  - remove_bad_landmarks
   - retriangulate_landmarks
   - loopclosure_all_missions
   - optvi --ba_num_iterations=5 -ba_visualize_every_n_iterations=1
   - retriangulate_landmarks
   - loopclosure_all_missions
-  - optvi --ba_num_iterations=30 -ba_visualize_every_n_iterations=5
+  - optvi --ba_num_iterations=30 -ba_visualize_every_n_iterations=1
+  - remove_invalid_observations
   - evaluate_landmark_quality
   - remove_bad_landmarks
   - save --map_folder=<CURRENT_VIMAP_FOLDER>_result

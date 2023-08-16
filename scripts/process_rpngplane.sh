@@ -38,6 +38,7 @@ roslaunch ov_maplab serial.launch \
   use_stereo:="true" \
   config:="rpng_plane" \
   dataset:="${bagnames[i]}" \
+  mapfolder:="/datasets/rpng_plane/maplab/raw_maps/${bagnames[i]}/" \
   dolivetraj:="true" &> /dev/null
 
 # print out the time elapsed
@@ -60,7 +61,6 @@ echo "BASH: full maplab opt took $elapsed seconds";
 
 # fix our permissions...
 sudo chmod -R 777 /datasets/rpng_plane/maplab/
-sudo chown -R patrick /datasets/rpng_plane/maplab/
 
 # print out the time elapsed
 big_end_time="$(date -u +%s)"

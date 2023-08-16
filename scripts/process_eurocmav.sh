@@ -36,6 +36,7 @@ roslaunch ov_maplab serial.launch \
   use_stereo:="true" \
   config:="euroc_mav" \
   dataset:="${bagnames[i]}" \
+  mapfolder:="/datasets/euroc_mav/maplab/raw_maps/${bagnames[i]}/" \
   dolivetraj:="true" &> /dev/null
 
 # print out the time elapsed
@@ -58,7 +59,6 @@ echo "BASH: full maplab opt took $elapsed seconds";
 
 # fix our permissions...
 sudo chmod -R 777 /datasets/euroc_mav/maplab/
-sudo chown -R patrick /datasets/euroc_mav/maplab/
 
 # print out the time elapsed
 big_end_time="$(date -u +%s)"
