@@ -34,7 +34,7 @@ cd ..
 Build the docker image:
 ```bash
 cd ov_maplab/
-docker build -t ov_maplab .
+docker build -t ov_maplab -f Dockerfile_ros1_20_04 .
 nano ~/.bashrc
 xhost + &> /dev/null
 export DOCKER_CATKINWS=/home/username/workspace/catkin_ws_maplab
